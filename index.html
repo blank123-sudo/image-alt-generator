@@ -6,108 +6,136 @@
     <title>Gemini AI Image Alt Text Generator</title>
     <style>
         :root {
-            --bg-color: #f4f6fa;
-            --card-bg: #ffffff;
-            --text-main: #1e293b;
+            --bg-color: #f1f5f9;
+            --surface: #ffffff;
+            --text-main: #0f172a;
             --text-muted: #64748b;
-            --accent: #2563eb; 
-            --accent-hover: #1d4ed8;
-            --accent-light: #eff6ff;
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --primary-light: #eff6ff;
             --border: #e2e8f0;
-            --success: #10b981;
-            --radius-lg: 16px;
-            --radius-md: 10px;
-            --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            --radius-xl: 20px;
+            --radius-lg: 12px;
+            --radius-md: 8px;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background: radial-gradient(circle at top right, #e0e7ff 0%, var(--bg-color) 40%);
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg-color);
+            background-image: radial-gradient(circle at top right, #e0e7ff 0%, transparent 40%);
             color: var(--text-main);
             margin: 0;
-            padding: 1.5rem;
+            padding: 2rem 1rem;
+            min-height: 100vh;
             display: flex;
             justify-content: center;
-            align-items: center;
-            min-height: 100vh;
+            align-items: flex-start;
             box-sizing: border-box;
             -webkit-font-smoothing: antialiased;
         }
 
-        .container {
-            background: var(--card-bg);
-            padding: 2.5rem 2rem;
-            border-radius: var(--radius-lg);
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 
-                        0 8px 10px -6px rgba(0, 0, 0, 0.05);
+        .app-wrapper {
             width: 100%;
-            max-width: 520px;
-            box-sizing: border-box;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2.5rem;
         }
 
         h1 {
-            font-size: 1.85rem;
-            font-weight: 700;
-            margin-top: 0;
-            margin-bottom: 0.5rem;
-            text-align: center;
-            background: linear-gradient(135deg, #1e3a8a 0%, var(--accent) 100%);
+            font-size: 2.25rem;
+            font-weight: 800;
+            letter-spacing: -0.025em;
+            margin: 0 0 0.5rem 0;
+            background: linear-gradient(135deg, #0f172a 0%, var(--primary) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
         p.subtitle {
             color: var(--text-muted);
-            text-align: center;
-            margin-bottom: 2.25rem;
-            font-size: 0.95rem;
+            font-size: 1.1rem;
+            margin: 0;
         }
 
-        .config-section {
-            margin-bottom: 1.75rem;
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+
+        /* Desktop Layout (Two Columns) */
+        @media (min-width: 860px) {
+            .main-grid {
+                grid-template-columns: 380px 1fr;
+                gap: 2rem;
+                align-items: stretch;
+            }
+            body {
+                align-items: center;
+                padding: 4rem 2rem;
+            }
+        }
+
+        .panel {
+            background: var(--surface);
+            padding: 2rem;
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- LEFT PANEL: INPUTS --- */
+        .input-group {
+            margin-bottom: 1.5rem;
         }
 
         label {
             display: block;
             font-weight: 600;
             margin-bottom: 0.5rem;
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            color: #475569;
+            font-size: 0.875rem;
+            color: #334155;
         }
 
-        input[type="password"], input[type="text"] {
+        input[type="password"] {
             width: 100%;
-            padding: 0.85rem 1rem;
+            padding: 0.875rem 1rem;
             border: 1px solid var(--border);
             border-radius: var(--radius-md);
             box-sizing: border-box;
-            font-size: 0.95rem;
+            font-size: 1rem;
             background-color: #f8fafc;
             transition: var(--transition);
         }
 
-        input[type="password"]:focus, input[type="text"]:focus {
+        input[type="password"]:focus {
             outline: none;
-            border-color: var(--accent);
-            background-color: #fff;
-            box-shadow: 0 0 0 4px rgba(37, 99, 233, 0.12);
+            border-color: var(--primary);
+            background-color: var(--surface);
+            box-shadow: 0 0 0 3px rgba(37, 99, 233, 0.15);
         }
 
-        .url-input-group {
-            display: flex;
-            gap: 0.5rem;
+        .help-text {
+            display: block;
             margin-top: 0.5rem;
+            font-size: 0.8rem;
+            color: var(--text-muted);
         }
 
-        .url-input-group input[type="text"] {
-            flex: 1;
-        }
-
-        .url-input-group button {
-            width: auto;
-            padding: 0.85rem 1.25rem;
-            white-space: nowrap;
+        .help-text a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
         }
 
         .drop-zone {
@@ -118,87 +146,111 @@
             cursor: pointer;
             background-color: #f8fafc;
             transition: var(--transition);
-            margin-bottom: 1.25rem;
+            margin-bottom: 1.5rem;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
 
         .drop-zone:hover, .drop-zone.drag-over {
-            border-color: var(--accent);
-            background-color: var(--accent-light);
+            border-color: var(--primary);
+            background-color: var(--primary-light);
         }
 
-        .divider {
-            text-align: center;
-            margin: 1.25rem 0;
-            position: relative;
+        .drop-zone p {
+            margin: 0;
             color: var(--text-muted);
-            font-size: 0.85rem;
-            font-weight: 600;
-            text-transform: uppercase;
+            font-size: 1rem;
         }
 
-        .divider::before, .divider::after {
-            content: "";
-            position: absolute;
-            top: 50%;
-            width: 40%;
-            height: 1px;
-            background-color: var(--border);
+        .drop-zone strong {
+            color: var(--primary);
         }
-
-        .divider::before { left: 0; }
-        .divider::after { right: 0; }
 
         #file-input { display: none; }
 
-        #preview-container {
-            display: none;
-            margin-bottom: 1.75rem;
-            text-align: center;
-            border-radius: var(--radius-md);
-            background-color: #f1f5f9;
-            padding: 0.5rem;
-            border: 1px solid var(--border);
-        }
-
-        #image-preview {
-            display: block;
-            max-width: 100%;
-            max-height: 280px;
-            margin: 0 auto;
-            border-radius: calc(var(--radius-md) - 4px);
-            object-fit: contain;
-        }
-
-        .action-btn {
+        button.primary-btn {
             width: 100%;
-            background-color: var(--accent);
+            background-color: var(--primary);
             color: white;
             border: none;
-            padding: 0.95rem;
+            padding: 1rem;
             border-radius: var(--radius-md);
-            font-size: 1rem;
+            font-size: 1.05rem;
             font-weight: 600;
             cursor: pointer;
-            box-shadow: 0 4px 12px rgba(37, 99, 233, 0.2);
+            box-shadow: var(--shadow-sm);
             transition: var(--transition);
         }
 
-        .action-btn:hover { background-color: var(--accent-hover); }
-        .action-btn:disabled {
+        button.primary-btn:hover:not(:disabled) {
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        button.primary-btn:disabled {
             background-color: #cbd5e1;
-            color: #94a3b8;
             cursor: not-allowed;
-            box-shadow: none;
+            transform: none;
+        }
+
+        /* --- RIGHT PANEL: OUTPUT --- */
+        .output-panel {
+            background-color: #f8fafc;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            min-height: 400px;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #94a3b8;
+            font-size: 1rem;
+        }
+
+        #preview-container {
+            display: none;
+            width: 100%;
+            height: 100%;
+            display: flex; /* Hidden via JS initially */
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+        }
+
+        .image-wrapper {
+            width: 100%;
+            height: 250px;
+            background-color: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+        }
+
+        #image-preview {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
         }
 
         #result-container {
+            width: 100%;
             display: none;
-            margin-top: 2rem;
-            padding: 1.25rem 1.5rem;
-            background-color: #f8fafc;
-            border-radius: var(--radius-md);
+            background: var(--surface);
             border: 1px solid var(--border);
-            border-left: 4px solid var(--accent);
+            border-left: 4px solid var(--primary);
+            border-radius: var(--radius-md);
+            padding: 1.25rem;
+            box-sizing: border-box;
+            box-shadow: var(--shadow-sm);
+            animation: slideUp 0.4s ease;
         }
 
         .result-header {
@@ -208,76 +260,132 @@
             margin-bottom: 0.75rem;
         }
 
-        .copy-btn {
-            background: none;
-            color: var(--accent);
-            border: none;
-            font-weight: 600;
-            cursor: pointer;
+        .result-header h3 {
+            margin: 0;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
         }
 
-        .status-message {
-            text-align: center;
-            font-size: 0.9rem;
-            font-weight: 500;
-            color: var(--accent);
-            margin-top: 1.25rem;
+        .copy-btn {
+            background: var(--primary-light);
+            color: var(--primary);
+            border: none;
+            padding: 0.35rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .copy-btn:hover {
+            background-color: #dbeafe;
+            color: var(--primary-hover);
+        }
+
+        #alt-text-output {
+            margin: 0;
+            font-size: 1rem;
+            line-height: 1.6;
+            color: var(--text-main);
+            word-wrap: break-word;
+        }
+
+        .loading-state {
             display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            width: 100%;
+            padding: 2rem 0;
+        }
+
+        .spinner {
+            width: 30px;
+            height: 30px;
+            border: 3px solid var(--primary-light);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Mobile tweaks */
+        @media (max-width: 600px) {
+            .panel { padding: 1.5rem; }
+            h1 { font-size: 1.75rem; }
+            .image-wrapper { height: 200px; }
         }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h1>Gemini Alt Image Text Generator</h1>
-    <p class="subtitle">Get fast, contextual accessibility text powered by Google Gemini.</p>
+<div class="app-wrapper">
+    <header>
+        <h1>Alt Text Generator</h1>
+        <p class="subtitle">Fast, accessible image descriptions powered by Gemini</p>
+    </header>
 
-    <div class="config-section">
-        <label for="api-key">Gemini API Key:</label>
-        <input type="password" id="api-key" placeholder="AIzaSy..." />
-    </div>
+    <main class="main-grid">
+        <div class="panel input-panel">
+            <div class="input-group">
+                <label for="api-key">API Key</label>
+                <input type="password" id="api-key" placeholder="Enter your Gemini API key..." />
+                <span class="help-text">Get a free key from <a href="https://aistudio.google.com/" target="_blank">Google AI Studio</a></span>
+            </div>
 
-    <div class="drop-zone" id="drop-zone">
-        <p>Drag & drop your image here or <strong>browse</strong></p>
-        <input type="file" id="file-input" accept="image/*">
-    </div>
+            <div class="drop-zone" id="drop-zone">
+                <p>Drag & drop an image or <strong>browse</strong></p>
+                <input type="file" id="file-input" accept="image/*">
+            </div>
 
-    <div class="divider">or</div>
-
-    <div class="config-section">
-        <label for="web-url-input">Load from Web Image URL:</label>
-        <div class="url-input-group">
-            <input type="text" id="web-url-input" placeholder="https://example.com/image.jpg" />
-            <button id="fetch-url-btn" class="action-btn">Fetch Image</button>
+            <button id="generate-btn" class="primary-btn" disabled>Generate Alt Text</button>
         </div>
-    </div>
 
-    <div id="preview-container">
-        <img id="image-preview" src="" alt="User uploaded preview">
-    </div>
+        <div class="panel output-panel">
+            
+            <div class="empty-state" id="empty-state">
+                No image uploaded yet.<br>Upload an image to see the preview and results here.
+            </div>
 
-    <button id="generate-btn" class="action-btn" disabled>Generate Alt Text</button>
+            <div id="preview-container" style="display: none;">
+                <div class="image-wrapper">
+                    <img id="image-preview" src="" alt="Preview">
+                </div>
 
-    <div class="status-message" id="status-message">Processing image payload...</div>
+                <div class="loading-state" id="loading-state">
+                    <div class="spinner"></div>
+                    <span style="color: var(--primary); font-weight: 500;">Analyzing image context...</span>
+                </div>
 
-    <div id="result-container">
-        <div class="result-header">
-            <h3 style="margin:0; font-size:0.85rem; color:var(--text-muted);">Suggested Alt Text</h3>
-            <button class="copy-btn" id="copy-btn">Copy</button>
+                <div id="result-container">
+                    <div class="result-header">
+                        <h3>Generated Alt Text</h3>
+                        <button class="copy-btn" id="copy-btn">Copy</button>
+                    </div>
+                    <p id="alt-text-output"></p>
+                </div>
+            </div>
+
         </div>
-        <p id="alt-text-output"></p>
-    </div>
+    </main>
 </div>
 
 <script>
     const dropZone = document.getElementById('drop-zone');
     const fileInput = document.getElementById('file-input');
-    const webUrlInput = document.getElementById('web-url-input');
-    const fetchUrlBtn = document.getElementById('fetch-url-btn');
+    const emptyState = document.getElementById('empty-state');
     const previewContainer = document.getElementById('preview-container');
     const imagePreview = document.getElementById('image-preview');
     const generateBtn = document.getElementById('generate-btn');
-    const statusMessage = document.getElementById('status-message');
+    const loadingState = document.getElementById('loading-state');
     const resultContainer = document.getElementById('result-container');
     const altTextOutput = document.getElementById('alt-text-output');
     const copyBtn = document.getElementById('copy-btn');
@@ -285,6 +393,7 @@
 
     let selectedFile = null;
 
+    // Handle Drag & Drop / File Selection
     dropZone.addEventListener('click', () => fileInput.click());
 
     ['dragenter', 'dragover'].forEach(eventName => {
@@ -301,162 +410,96 @@
         });
     });
 
-    dropZone.addEventListener('drop', async (e) => {
-        e.preventDefault();
-        const dt = e.dataTransfer;
-        const files = dt.files;
-        
-        if (files.length) {
-            handleFile(files[0]);
-        } else {
-            let imageUrl = dt.getData('text/uri-list');
-            const html = dt.getData('text/html');
-
-            if (!imageUrl && html) {
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(html, 'text/html');
-                const img = doc.querySelector('img');
-                if (img && img.src) imageUrl = img.src;
-            }
-
-            if (imageUrl) {
-                webUrlInput.value = imageUrl;
-                handleWebImageUrl(imageUrl);
-            }
-        }
+    dropZone.addEventListener('drop', (e) => {
+        const file = e.dataTransfer.files[0];
+        if (file) handleFile(file);
     });
 
     fileInput.addEventListener('change', (e) => {
         if (e.target.files.length) handleFile(e.target.files[0]);
     });
 
-    fetchUrlBtn.addEventListener('click', () => {
-        const url = webUrlInput.value.trim();
-        if (!url) return alert("Please enter a web image URL.");
-        handleWebImageUrl(url);
-    });
-
     function handleFile(file) {
-        if (!file.type.startsWith('image/')) return alert('Please select an image file.');
+        if (!file.type.startsWith('image/')) {
+            alert('Please select a valid image file.');
+            return;
+        }
         selectedFile = file;
+        
         const reader = new FileReader();
         reader.readAsDataURL(file);
         reader.onloadend = () => {
             imagePreview.src = reader.result;
-            previewContainer.style.display = 'block';
+            emptyState.style.display = 'none';
+            previewContainer.style.display = 'flex';
             generateBtn.disabled = false;
             resultContainer.style.display = 'none';
         }
     }
 
-    async function handleWebImageUrl(url) {
-        statusMessage.textContent = "Routing request through safe PHP server gateway...";
-        statusMessage.style.display = 'block';
-        previewContainer.style.display = 'none';
-        resultContainer.style.display = 'none';
-        generateBtn.disabled = true;
-
-        try {
-            // First attempt a direct lightweight cross-origin grab
-            const base64Str = await convertImgToDataURL(url, true);
-            imagePreview.src = base64Str;
-            finalizeWebImage(url);
-        } catch (directError) {
-            console.warn("Direct browser fetch blocked by CORS. Diverting to local PHP handler...");
-            
-            try {
-                // Secondary fallback: Send request to your script hidden inside the 'api/' directory
-                const response = await fetch('api/fetch-image.php', { 
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ url: url })
-                });
-                
-                if (!response.ok) throw new Error();
-                const data = await response.json();
-                
-                imagePreview.src = data.dataURL;
-                finalizeWebImage(url);
-            } catch (backendError) {
-                statusMessage.style.display = 'none';
-                alert("Execution Fault: Your backend PHP handler script (api/fetch-image.php) could not process this resource.");
-            }
-        }
-    }
-
-    function finalizeWebImage(url) {
-        let mimeType = 'image/jpeg';
-        if (url.toLowerCase().includes('.png')) mimeType = 'image/png';
-        else if (url.toLowerCase().includes('.webp')) mimeType = 'image/webp';
-        
-        selectedFile = { type: mimeType };
-        previewContainer.style.display = 'block';
-        generateBtn.disabled = false;
-        statusMessage.style.display = 'none';
-    }
-
-    function convertImgToDataURL(url, directMode) {
-        return new Promise((resolve, reject) => {
-            const img = new Image();
-            if (directMode) img.crossOrigin = 'Anonymous';
-            img.onload = function() {
-                const canvas = document.createElement('canvas');
-                canvas.width = this.naturalWidth;
-                canvas.height = this.naturalHeight;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(this, 0, 0);
-                resolve(canvas.toDataURL('image/jpeg'));
-            };
-            img.onerror = () => reject(new Error());
-            img.src = url;
-        });
-    }
-
+    // Call the Gemini API
     generateBtn.addEventListener('click', async () => {
         const apiKey = apiKeyInput.value.trim();
-        if (!apiKey) return alert('Please enter your Gemini API Key.');
+        if (!apiKey) {
+            alert('Please enter your Gemini API Key.');
+            return;
+        }
 
+        if (!selectedFile || !imagePreview.src) return;
+
+        // UI State Updates
         generateBtn.disabled = true;
-        statusMessage.textContent = "Gemini is looking closely at your image...";
-        statusMessage.style.display = 'block';
+        resultContainer.style.display = 'none';
+        loadingState.style.display = 'flex';
 
         try {
             const base64Data = imagePreview.src.split(',')[1];
+            const mimeType = selectedFile.type;
+
+            const payload = {
+                contents: [{
+                    parts: [
+                        { text: "Provide a clean, concise, descriptive alt text phrase for this image for web accessibility purposes. Describe the focal point, setting, and text if present. Crucially, DO NOT describe the color of any clothing worn by people in the image. Do not include commentary, labels, metadata, or introductory text like 'An image of...' or 'This image shows...'." },
+                        { inline_data: { mime_type: mimeType, data: base64Data } }
+                    ]
+                }]
+            };
+
+            // Using the current generation gemini-3-flash-preview endpoint
             const response = await fetch(
-                `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${apiKey}`,
+                `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`,
                 {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [{
-                            parts: [
-                                { text: "Provide a clean, concise, descriptive alt text phrase for this image for web accessibility purposes." },
-                                { inline_data: { mime_type: selectedFile.type, data: base64Data } }
-                            ]
-                        }]
-                    })
+                    body: JSON.stringify(payload)
                 }
             );
 
             const result = await response.json();
+
             if (response.ok && result.candidates?.[0]?.content?.parts?.[0]?.text) {
-                altTextOutput.textContent = result.candidates[0].content.parts[0].text.trim().replace(/^["']|["']$/g, '');
+                let altText = result.candidates[0].content.parts[0].text.trim();
+                altText = altText.replace(/^["']|["']$/g, ''); // Clean rogue quotes
+                
+                altTextOutput.textContent = altText;
                 resultContainer.style.display = 'block';
             } else {
-                throw new Error(result.error?.message || "Invalid API execution response.");
+                throw new Error(result.error?.message || "Failed to parse response. Verify your API key.");
             }
         } catch (error) {
             alert("Error: " + error.message);
         } finally {
             generateBtn.disabled = false;
-            statusMessage.style.display = 'none';
+            loadingState.style.display = 'none';
         }
     });
 
+    // Copy to Clipboard
     copyBtn.addEventListener('click', () => {
         navigator.clipboard.writeText(altTextOutput.textContent).then(() => {
+            const originalText = copyBtn.textContent;
             copyBtn.textContent = 'Copied!';
-            setTimeout(() => copyBtn.textContent = 'Copy', 2000);
+            setTimeout(() => copyBtn.textContent = originalText, 2000);
         });
     });
 </script>
