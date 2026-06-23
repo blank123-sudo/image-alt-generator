@@ -334,6 +334,7 @@
     </header>
 
     <main class="main-grid">
+        <!-- LEFT PANEL: Controls -->
         <div class="panel input-panel">
             <div class="input-group">
                 <label for="api-key">API Key</label>
@@ -349,6 +350,7 @@
             <button id="generate-btn" class="primary-btn" disabled>Generate Alt Text</button>
         </div>
 
+        <!-- RIGHT PANEL: Preview & Results -->
         <div class="panel output-panel">
             
             <div class="empty-state" id="empty-state">
@@ -459,7 +461,7 @@
             const payload = {
                 contents: [{
                     parts: [
-                        { text: "Provide a clean, concise, descriptive alt text phrase for this image for web accessibility purposes. Describe the focal point, setting, and text if present. Crucially, DO NOT describe the color of any clothing worn by people in the image. Do not include commentary, labels, metadata, or introductory text like 'An image of...' or 'This image shows...'." },
+                        { text: "Provide a clean, concise, descriptive alt text phrase for this image for web accessibility purposes. Describe the focal point, setting, and text if present. Crucially: 1) DO NOT describe the color of any clothing worn by people, 2) DO NOT describe the ethnicity of any person, and 3) If depicting an older person, use the term 'elderly person' instead of 'senior'. Do not include commentary, labels, metadata, or introductory text like 'An image of...' or 'This image shows...'." },
                         { inline_data: { mime_type: mimeType, data: base64Data } }
                     ]
                 }]
