@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gemini AI Image Alt Text Generator</title>
+    <title>Gemini AI Batch Alt Text Generator</title>
     <style>
         :root {
             --bg-color: #f1f5f9;
@@ -14,12 +14,13 @@
             --primary-hover: #1d4ed8;
             --primary-light: #eff6ff;
             --border: #e2e8f0;
+            --success: #10b981;
+            --error: #ef4444;
             --radius-xl: 20px;
             --radius-lg: 12px;
             --radius-md: 8px;
             --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
             --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
             --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
@@ -40,7 +41,7 @@
 
         .app-wrapper {
             width: 100%;
-            max-width: 1000px;
+            max-width: 1100px;
             margin: 0 auto;
         }
 
@@ -71,16 +72,11 @@
             gap: 1.5rem;
         }
 
-        /* Desktop Layout (Two Columns) */
         @media (min-width: 860px) {
             .main-grid {
-                grid-template-columns: 380px 1fr;
+                grid-template-columns: 350px 1fr;
                 gap: 2rem;
                 align-items: stretch;
-            }
-            body {
-                align-items: center;
-                padding: 4rem 2rem;
             }
         }
 
@@ -92,12 +88,10 @@
             border: 1px solid var(--border);
             display: flex;
             flex-direction: column;
+            max-height: calc(100vh - 8rem);
         }
 
-        /* --- LEFT PANEL: INPUTS --- */
-        .input-group {
-            margin-bottom: 1.5rem;
-        }
+        .input-group { margin-bottom: 1.5rem; }
 
         label {
             display: block;
@@ -158,30 +152,27 @@
             background-color: var(--primary-light);
         }
 
-        .drop-zone p {
-            margin: 0;
-            color: var(--text-muted);
-            font-size: 1rem;
-        }
-
-        .drop-zone strong {
-            color: var(--primary);
-        }
-
+        .drop-zone p { margin: 0; color: var(--text-muted); font-size: 1rem; }
+        .drop-zone strong { color: var(--primary); }
         #file-input { display: none; }
 
-        button.primary-btn {
+        .btn-group { display: flex; gap: 0.75rem; flex-direction: column; }
+
+        button.primary-btn, button.secondary-btn {
             width: 100%;
-            background-color: var(--primary);
-            color: white;
             border: none;
             padding: 1rem;
             border-radius: var(--radius-md);
             font-size: 1.05rem;
             font-weight: 600;
             cursor: pointer;
-            box-shadow: var(--shadow-sm);
             transition: var(--transition);
+        }
+
+        button.primary-btn {
+            background-color: var(--primary);
+            color: white;
+            box-shadow: var(--shadow-sm);
         }
 
         button.primary-btn:hover:not(:disabled) {
@@ -190,94 +181,109 @@
             box-shadow: var(--shadow-md);
         }
 
-        button.primary-btn:disabled {
-            background-color: #cbd5e1;
-            cursor: not-allowed;
-            transform: none;
+        button.secondary-btn {
+            background-color: #f1f5f9;
+            color: #475569;
+            display: none;
         }
 
-        /* --- RIGHT PANEL: OUTPUT --- */
+        button.secondary-btn:hover:not(:disabled) { background-color: #e2e8f0; }
+
+        button:disabled {
+            background-color: #cbd5e1 !important;
+            color: #94a3b8 !important;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
         .output-panel {
             background-color: #f8fafc;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-            min-height: 400px;
+            overflow-y: auto;
+            padding: 1.5rem;
+        }
+
+        .output-panel::-webkit-scrollbar { width: 8px; }
+        .output-panel::-webkit-scrollbar-track { background: transparent; }
+        .output-panel::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 10px;
         }
 
         .empty-state {
             text-align: center;
             color: #94a3b8;
             font-size: 1rem;
-        }
-
-        #preview-container {
-            display: none;
-            width: 100%;
             height: 100%;
-            display: flex; /* Hidden via JS initially */
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-start;
-        }
-
-        .image-wrapper {
-            width: 100%;
-            height: 250px;
-            background-color: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-lg);
             display: flex;
             align-items: center;
             justify-content: center;
-            overflow: hidden;
-            margin-bottom: 1.5rem;
+            min-height: 300px;
         }
 
-        #image-preview {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-        }
+        #gallery { display: flex; flex-direction: column; gap: 1.25rem; }
 
-        #result-container {
-            width: 100%;
-            display: none;
+        .gallery-item {
+            display: flex;
             background: var(--surface);
             border: 1px solid var(--border);
-            border-left: 4px solid var(--primary);
-            border-radius: var(--radius-md);
-            padding: 1.25rem;
-            box-sizing: border-box;
+            border-radius: var(--radius-lg);
+            padding: 1rem;
+            gap: 1.25rem;
             box-shadow: var(--shadow-sm);
-            animation: slideUp 0.4s ease;
+            animation: slideIn 0.3s ease-out;
+            position: relative;
         }
 
-        .result-header {
+        @media (max-width: 600px) { .gallery-item { flex-direction: column; } }
+
+        .item-thumb-container {
+            flex-shrink: 0;
+            width: 120px;
+            height: 120px;
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            background-color: #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @media (max-width: 600px) {
+            .item-thumb-container { width: 100%; height: 180px; }
+        }
+
+        .item-thumb { width: 100%; height: 100%; object-fit: cover; }
+        .item-content { flex-grow: 1; display: flex; flex-direction: column; min-width: 0; }
+
+        .item-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 0.75rem;
+            margin-bottom: 0.5rem;
         }
 
-        .result-header h3 {
-            margin: 0;
+        .item-filename {
             font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
             color: var(--text-muted);
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 200px;
         }
 
         .copy-btn {
             background: var(--primary-light);
             color: var(--primary);
             border: none;
-            padding: 0.35rem 0.75rem;
+            padding: 0.25rem 0.5rem;
             border-radius: 6px;
-            font-size: 0.85rem;
+            font-size: 0.75rem;
             font-weight: 600;
             cursor: pointer;
             transition: var(--transition);
+            display: none;
         }
         
         .copy-btn:hover {
@@ -285,43 +291,64 @@
             color: var(--primary-hover);
         }
 
-        #alt-text-output {
-            margin: 0;
-            font-size: 1rem;
-            line-height: 1.6;
+        .item-text-area {
+            flex-grow: 1;
+            font-size: 0.95rem;
+            line-height: 1.5;
             color: var(--text-main);
+            background-color: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 0.75rem;
             word-wrap: break-word;
         }
 
-        .loading-state {
-            display: none;
-            flex-direction: column;
+        .item-status {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            font-style: italic;
+            display: flex;
             align-items: center;
-            gap: 1rem;
-            width: 100%;
-            padding: 2rem 0;
+            gap: 0.5rem;
+            height: 100%;
+            justify-content: center;
         }
 
+        .item-status.error { color: var(--error); font-style: normal; }
+
+        .remove-btn {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            cursor: pointer;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .remove-btn:hover { color: var(--error); border-color: var(--error); }
+
         .spinner {
-            width: 30px;
-            height: 30px;
-            border: 3px solid var(--primary-light);
+            width: 16px;
+            height: 16px;
+            border: 2px solid var(--border);
             border-top-color: var(--primary);
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
 
         @keyframes spin { 100% { transform: rotate(360deg); } }
-        @keyframes slideUp {
+        @keyframes slideIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Mobile tweaks */
-        @media (max-width: 600px) {
-            .panel { padding: 1.5rem; }
-            h1 { font-size: 1.75rem; }
-            .image-wrapper { height: 200px; }
         }
     </style>
 </head>
@@ -329,12 +356,11 @@
 
 <div class="app-wrapper">
     <header>
-        <h1>Alt Text Generator</h1>
-        <p class="subtitle">Fast, accessible image descriptions powered by Gemini</p>
+        <h1>Batch Alt Text Generator</h1>
+        <p class="subtitle">Upload multiple images. Get accessible descriptions powered by Gemini.</p>
     </header>
 
     <main class="main-grid">
-        <!-- LEFT PANEL: Controls -->
         <div class="panel input-panel">
             <div class="input-group">
                 <label for="api-key">API Key</label>
@@ -343,39 +369,21 @@
             </div>
 
             <div class="drop-zone" id="drop-zone">
-                <p>Drag & drop an image or <strong>browse</strong></p>
-                <input type="file" id="file-input" accept="image/*">
+                <p>Drag & drop images here or <strong>browse</strong></p>
+                <input type="file" id="file-input" accept="image/*" multiple>
             </div>
 
-            <button id="generate-btn" class="primary-btn" disabled>Generate Alt Text</button>
+            <div class="btn-group">
+                <button id="generate-btn" class="primary-btn" disabled>Generate All Alt Text</button>
+                <button id="clear-btn" class="secondary-btn">Clear All</button>
+            </div>
         </div>
 
-        <!-- RIGHT PANEL: Preview & Results -->
         <div class="panel output-panel">
-            
             <div class="empty-state" id="empty-state">
-                No image uploaded yet.<br>Upload an image to see the preview and results here.
+                No images uploaded yet.<br>Upload one or more images to get started.
             </div>
-
-            <div id="preview-container" style="display: none;">
-                <div class="image-wrapper">
-                    <img id="image-preview" src="" alt="Preview">
-                </div>
-
-                <div class="loading-state" id="loading-state">
-                    <div class="spinner"></div>
-                    <span style="color: var(--primary); font-weight: 500;">Analyzing image context...</span>
-                </div>
-
-                <div id="result-container">
-                    <div class="result-header">
-                        <h3>Generated Alt Text</h3>
-                        <button class="copy-btn" id="copy-btn">Copy</button>
-                    </div>
-                    <p id="alt-text-output"></p>
-                </div>
-            </div>
-
+            <div id="gallery"></div>
         </div>
     </main>
 </div>
@@ -384,18 +392,14 @@
     const dropZone = document.getElementById('drop-zone');
     const fileInput = document.getElementById('file-input');
     const emptyState = document.getElementById('empty-state');
-    const previewContainer = document.getElementById('preview-container');
-    const imagePreview = document.getElementById('image-preview');
+    const gallery = document.getElementById('gallery');
     const generateBtn = document.getElementById('generate-btn');
-    const loadingState = document.getElementById('loading-state');
-    const resultContainer = document.getElementById('result-container');
-    const altTextOutput = document.getElementById('alt-text-output');
-    const copyBtn = document.getElementById('copy-btn');
+    const clearBtn = document.getElementById('clear-btn');
     const apiKeyInput = document.getElementById('api-key');
 
-    let selectedFile = null;
+    let uploadedImages = [];
 
-    // Handle Drag & Drop / File Selection
+    // --- Drag & Drop & File Selection Logic ---
     dropZone.addEventListener('click', () => fileInput.click());
 
     ['dragenter', 'dragover'].forEach(eventName => {
@@ -413,33 +417,111 @@
     });
 
     dropZone.addEventListener('drop', (e) => {
-        const file = e.dataTransfer.files[0];
-        if (file) handleFile(file);
+        const files = Array.from(e.dataTransfer.files);
+        handleFiles(files);
     });
 
     fileInput.addEventListener('change', (e) => {
-        if (e.target.files.length) handleFile(e.target.files[0]);
+        const files = Array.from(e.target.files);
+        handleFiles(files);
+        fileInput.value = ''; 
     });
 
-    function handleFile(file) {
-        if (!file.type.startsWith('image/')) {
-            alert('Please select a valid image file.');
+    // --- Process Selected Files ---
+    function handleFiles(files) {
+        const imageFiles = files.filter(file => file.type.startsWith('image/'));
+        
+        if (imageFiles.length === 0) {
+            alert('Please select valid image files.');
             return;
         }
-        selectedFile = file;
-        
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onloadend = () => {
-            imagePreview.src = reader.result;
+
+        imageFiles.forEach(file => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onloadend = () => {
+                const uniqueId = 'img-' + Math.random().toString(36).substr(2, 9);
+                const imageData = {
+                    id: uniqueId,
+                    file: file,
+                    base64: reader.result.split(',')[1],
+                    mimeType: file.type,
+                    previewUrl: reader.result,
+                    status: 'pending' 
+                };
+                
+                uploadedImages.push(imageData);
+                renderGalleryItem(imageData);
+                updateUIState();
+            };
+        });
+    }
+
+    // --- Render Individual Image Card ---
+    function renderGalleryItem(imgData) {
+        emptyState.style.display = 'none';
+
+        const item = document.createElement('div');
+        item.className = 'gallery-item';
+        item.id = imgData.id;
+
+        item.innerHTML = `
+            <div class="remove-btn" onclick="removeImage('${imgData.id}')" title="Remove image">✕</div>
+            <div class="item-thumb-container">
+                <img src="${imgData.previewUrl}" class="item-thumb" alt="Upload preview">
+            </div>
+            <div class="item-content">
+                <div class="item-header">
+                    <span class="item-filename">${imgData.file.name}</span>
+                    <button class="copy-btn" id="copy-${imgData.id}">Copy</button>
+                </div>
+                <div class="item-text-area" id="text-area-${imgData.id}">
+                    <div class="item-status">Ready to generate...</div>
+                </div>
+            </div>
+        `;
+
+        gallery.appendChild(item);
+
+        const copyBtn = item.querySelector(`#copy-${imgData.id}`);
+        copyBtn.addEventListener('click', () => {
+            const textToCopy = item.querySelector(`#text-area-${imgData.id}`).innerText;
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                const originalText = copyBtn.textContent;
+                copyBtn.textContent = 'Copied!';
+                setTimeout(() => copyBtn.textContent = originalText, 2000);
+            });
+        });
+    }
+
+    window.removeImage = function(id) {
+        uploadedImages = uploadedImages.filter(img => img.id !== id);
+        const itemElement = document.getElementById(id);
+        if (itemElement) itemElement.remove();
+        updateUIState();
+    };
+
+    clearBtn.addEventListener('click', () => {
+        uploadedImages = [];
+        gallery.innerHTML = '';
+        updateUIState();
+    });
+
+    function updateUIState() {
+        if (uploadedImages.length > 0) {
             emptyState.style.display = 'none';
-            previewContainer.style.display = 'flex';
             generateBtn.disabled = false;
-            resultContainer.style.display = 'none';
+            generateBtn.textContent = `Generate All Alt Text (${uploadedImages.length})`;
+            clearBtn.style.display = 'block';
+        } else {
+            emptyState.style.display = 'flex';
+            generateBtn.disabled = true;
+            generateBtn.textContent = 'Generate Alt Text';
+            clearBtn.style.display = 'none';
         }
     }
 
-    // Call the Gemini API
+    // --- Call Gemini API with Model Failover Routing ---
     generateBtn.addEventListener('click', async () => {
         const apiKey = apiKeyInput.value.trim();
         if (!apiKey) {
@@ -447,62 +529,107 @@
             return;
         }
 
-        if (!selectedFile || !imagePreview.src) return;
-
-        // UI State Updates
         generateBtn.disabled = true;
-        resultContainer.style.display = 'none';
-        loadingState.style.display = 'flex';
+        clearBtn.disabled = true;
+        generateBtn.textContent = 'Generating...';
 
-        try {
-            const base64Data = imagePreview.src.split(',')[1];
-            const mimeType = selectedFile.type;
-
-            const payload = {
-                contents: [{
-                    parts: [
-                        { text: "Provide a clean, concise, descriptive alt text phrase for this image for web accessibility purposes. Describe the focal point, setting, and text if present. Crucially: 1) DO NOT describe the color of any clothing worn by people, 2) DO NOT describe the ethnicity of any person, and 3) If depicting an older person, use the term 'elderly person' instead of 'senior'. Do not include commentary, labels, metadata, or introductory text like 'An image of...' or 'This image shows...'." },
-                        { inline_data: { mime_type: mimeType, data: base64Data } }
-                    ]
-                }]
-            };
-
-            // Using the current generation gemini-3-flash-preview endpoint
-            const response = await fetch(
-                `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`,
-                {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                }
-            );
-
-            const result = await response.json();
-
-            if (response.ok && result.candidates?.[0]?.content?.parts?.[0]?.text) {
-                let altText = result.candidates[0].content.parts[0].text.trim();
-                altText = altText.replace(/^["']|["']$/g, ''); // Clean rogue quotes
-                
-                altTextOutput.textContent = altText;
-                resultContainer.style.display = 'block';
-            } else {
-                throw new Error(result.error?.message || "Failed to parse response. Verify your API key.");
-            }
-        } catch (error) {
-            alert("Error: " + error.message);
-        } finally {
-            generateBtn.disabled = false;
-            loadingState.style.display = 'none';
-        }
-    });
-
-    // Copy to Clipboard
-    copyBtn.addEventListener('click', () => {
-        navigator.clipboard.writeText(altTextOutput.textContent).then(() => {
-            const originalText = copyBtn.textContent;
-            copyBtn.textContent = 'Copied!';
-            setTimeout(() => copyBtn.textContent = originalText, 2000);
+        const getPayload = (base64Data, mimeType) => ({
+            contents: [{
+                parts: [
+                    { text: "Provide a clean, concise, descriptive alt text phrase for this image for web accessibility purposes. Describe the focal point, setting, and text if present. Crucially: 1) DO NOT describe the color of any clothing worn by people, 2) DO NOT describe the ethnicity of any person, and 3) If depicting an older person, use the term 'elderly person' instead of 'senior'. Do not include commentary, labels, metadata, or introductory text like 'An image of...' or 'This image shows...'." },
+                    { inline_data: { mime_type: mimeType, data: base64Data } }
+                ]
+            }]
         });
+
+        // The Cascading Fallover Pool (Ordered from highest intelligence to high availability)
+        const modelsPool = [
+            'gemini-3.5-flash',
+            'gemini-3.1-flash-lite',
+            'gemini-2.5-flash',
+            'gemini-2.5-flash-lite'
+        ];
+
+        // Process images one by one
+        for (const img of uploadedImages) {
+            if (img.status === 'completed') continue;
+
+            const textArea = document.getElementById(`text-area-${img.id}`);
+            const copyBtn = document.getElementById(`copy-${img.id}`);
+            let targetCompleted = false;
+
+            // Loop through our array of models until one accepts the request
+            for (let i = 0; i < modelsPool.length; i++) {
+                const currentModel = modelsPool[i];
+                
+                textArea.innerHTML = `
+                    <div class="item-status">
+                        <div class="spinner"></div> Routing to ${currentModel}...
+                    </div>`;
+
+                try {
+                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${currentModel}:generateContent?key=${apiKey}`;
+                    
+                    const options = {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(getPayload(img.base64, img.mimeType))
+                    };
+
+                    const response = await fetch(apiUrl, options);
+                    const result = await response.json();
+
+                    // 1. SUCCESS: Set text and break out of the model pool loop
+                    if (response.ok && result.candidates) {
+                        let altText = result.candidates[0].content.parts[0].text.trim();
+                        altText = altText.replace(/^["']|["']$/g, ''); 
+                        
+                        textArea.textContent = altText;
+                        copyBtn.style.display = 'block'; 
+                        img.status = 'completed';
+                        targetCompleted = true;
+                        break; 
+                    }
+
+                    // 2. HARD CONFIG ERROR: If API key is bad, don't loop models, just stop.
+                    const errorMsg = result.error?.message?.toLowerCase() || "";
+                    if (response.status === 400 || response.status === 403 || errorMsg.includes("api key")) {
+                        throw new Error(result.error?.message || "API Key Error");
+                    }
+
+                    // 3. SERVER BUSY/QUOTA: Log the fallback event in the UI and let the loop continue to next model
+                    textArea.innerHTML = `
+                        <div class="item-status" style="color: #d97706;">
+                            <div class="spinner" style="border-top-color: #d97706;"></div> 
+                            ${currentModel} busy. Dropping to fallback...
+                        </div>`;
+                    
+                    // Wait 1 second before trying the fallback model to let networks breathe
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+
+                } catch (error) {
+                    if (error.message.includes("API Key Error")) {
+                        textArea.innerHTML = `<div class="item-status error">Configuration Error: ${error.message}</div>`;
+                        img.status = 'error';
+                        targetCompleted = false;
+                        break; // Stop completely for bad keys
+                    }
+                    console.warn(`${currentModel} failed, trying next fallback.`, error);
+                }
+            }
+
+            // If the code cycled through all models and nothing responded successfully
+            if (!targetCompleted && img.status !== 'error') {
+                textArea.innerHTML = `<div class="item-status error">Error: All free models are currently overloaded.</div>`;
+                img.status = 'error';
+            }
+
+            // 3-second recovery delay between distinct images to prevent rapid gateway blocking
+            await new Promise(resolve => setTimeout(resolve, 3000));
+        }
+
+        updateUIState();
+        clearBtn.disabled = false;
     });
 </script>
 
